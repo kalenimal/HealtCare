@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-950: #031f37;
+  --color-navy-800: #144266;
+  --color-navy-400: #7fa2ba;
+  --color-sand-300: #b7a597;
+  --color-mist-100: #e5e4e0;
+
+  --font-sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-mist-100);
+  color: var(--color-navy-950);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+* {
+  box-sizing: border-box;
+}

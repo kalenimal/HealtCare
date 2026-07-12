@@ -1,0 +1,100 @@
+import type { MetricComment } from './types';
+
+export const mockComments: MetricComment[] = [
+  {
+    id: 'c-1',
+    patientId: 'p-2',
+    date: '2026-07-05',
+    author: 'system',
+    authorName: 'Система мониторинга',
+    metricKey: 'bpSystolic',
+    text: 'В этом месяце ваше систолическое давление выросло на 6%. Рекомендуем снизить потребление соли и ограничить курение.',
+    tone: 'warning',
+  },
+  {
+    id: 'c-2',
+    patientId: 'p-2',
+    date: '2026-07-08',
+    author: 'specialist',
+    authorName: 'Фёдорова А. И.',
+    metricKey: 'cigarettes',
+    text: 'Количество выкуриваемых сигарет продолжает расти. Рекомендую консультацию с кардиологом и пульмонологом в ближайшие две недели.',
+    tone: 'critical',
+  },
+  {
+    id: 'c-3',
+    patientId: 'p-4',
+    date: '2026-07-02',
+    author: 'system',
+    authorName: 'Система мониторинга',
+    metricKey: 'kcal',
+    text: 'Средняя калорийность рациона превышает норму, количество шагов снижается. Это повышает риск набора веса и нагрузки на сердечно-сосудистую систему.',
+    tone: 'warning',
+  },
+  {
+    id: 'c-4',
+    patientId: 'p-4',
+    date: '2026-07-09',
+    author: 'specialist',
+    authorName: 'Фёдорова А. И.',
+    metricKey: 'steps',
+    text: 'Рекомендую увеличить физическую активность до 30 минут в день и пересмотреть рацион совместно с диетологом.',
+    tone: 'warning',
+  },
+  {
+    id: 'c-5',
+    patientId: 'p-5',
+    date: '2026-07-06',
+    author: 'system',
+    authorName: 'Система мониторинга',
+    metricKey: 'hb',
+    text: 'Уровень гемоглобина и ферритина снижается на протяжении последнего месяца. Возможны признаки железодефицита.',
+    tone: 'warning',
+  },
+  {
+    id: 'c-6',
+    patientId: 'p-5',
+    date: '2026-07-10',
+    author: 'specialist',
+    authorName: 'Фёдорова А. И.',
+    metricKey: 'ferritin',
+    text: 'По лабораторным показателям рекомендую сдать развёрнутый анализ крови повторно и рассмотреть приём препаратов железа после консультации терапевта.',
+    tone: 'critical',
+  },
+  {
+    id: 'c-7',
+    patientId: 'p-6',
+    date: '2026-07-11',
+    author: 'system',
+    authorName: 'Система мониторинга',
+    metricKey: 'stressLevel',
+    text: 'В этом месяце ваш уровень стресса повысился, дальнейшее увеличение стресс-факторов может привести к депрессивным эпизодам, снизьте рабочую нагрузку и посетите психолога.',
+    tone: 'critical',
+  },
+  {
+    id: 'c-8',
+    patientId: 'p-1',
+    date: '2026-07-04',
+    author: 'system',
+    authorName: 'Система мониторинга',
+    metricKey: null,
+    text: 'Ваши показатели находятся в пределах нормы. Продолжайте в том же темпе — так держать!',
+    tone: 'info',
+  },
+  {
+    id: 'c-9',
+    patientId: 'p-3',
+    date: '2026-07-07',
+    author: 'specialist',
+    authorName: 'Фёдорова А. И.',
+    metricKey: 'steps',
+    text: 'Отличная динамика по физической активности за последний месяц. Рекомендую сохранить текущий режим тренировок.',
+    tone: 'info',
+  },
+];
+
+export function getCommentsForPatient(patientId: string): MetricComment[] {
+  return mockComments
+    .filter((c) => c.patientId === patientId)
+    .sort((a, b) => b.date.localeCompare(a.date));
+}
