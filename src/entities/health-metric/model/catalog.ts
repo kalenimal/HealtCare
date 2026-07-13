@@ -61,15 +61,15 @@ export const metricCatalog: Record<MetricKey, MetricDefinition> = {
     higherIsBetter: true,
     decimals: 0,
   },
-  waterGlasses: {
-    key: 'waterGlasses',
+  waterLiters: {
+    key: 'waterLiters',
     label: 'Выпито воды',
     shortLabel: 'Вода',
-    unit: 'стаканов/день',
+    unit: 'л/день',
     group: 'lifestyle',
-    normalRange: [6, 8],
+    normalRange: [1.5, 2],
     higherIsBetter: true,
-    decimals: 0,
+    decimals: 1,
   },
   stressLevel: {
     key: 'stressLevel',

@@ -9,6 +9,7 @@ import { metricCatalog, metricKeys, type MetricKey } from '@/entities/health-met
 import { buildGroupReport, type GroupReport } from '@/entities/report';
 import { PeriodSelect } from '@/features/period-select/ui/PeriodSelect';
 import { ExportButton } from '@/features/export-xls/ui/ExportButton';
+import { exportSheetsToXlsx, type XlsxSheet } from '@/shared/lib/export-xlsx';
 
 export function SpecialistReportsPage() {
   const [groupId, setGroupId] = useState(mockGroups[0].id);
@@ -16,11 +17,15 @@ export function SpecialistReportsPage() {
   const [periodDays, setPeriodDays] = useState(30);
   const [report, setReport] = useState<GroupReport | null>(null);
 
+  const [compareKeys, setCompareKeys] = useState<MetricKey[]>([]);
+  const [comparing, setComparing] = useState(false);
+
   const handleGenerate = () => {
     setReport(buildGroupReport(groupId, metricKey, periodDays));
   };
 
   const metric = metricCatalog[metricKey];
+  const selectedGroup = mockGroups.find((g) => g.id === groupId);
 
   const exportColumns = [
     { header: 'Участник', key: 'name', width: 28 },
@@ -36,6 +41,62 @@ export function SpecialistReportsPage() {
       latest: row.latestValue,
       change: row.changePercent,
     })) ?? [];
+
+  const toggleCompareKey = (key: MetricKey) => {
+    setCompareKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
+    );
+  };
+
+  const handleExportComparison = async () => {
+    if (compareKeys.length === 0) return;
+    setComparing(true);
+    try {
+      const reports = compareKeys
+        .map((key) => buildGroupReport(groupId, key, periodDays))
+        .filter((r): r is GroupReport => r !== null);
+      if (reports.length === 0) return;
+
+      const summarySheet: XlsxSheet = {
+        sheetName: 'Сравнение',
+        columns: [
+          { header: 'Участник', key: 'name', width: 28 },
+          ...reports.map((r) => ({
+            header: `${metricCatalog[r.metricKey].label}, ${metricCatalog[r.metricKey].unit}`,
+            key: r.metricKey,
+            width: 24,
+          })),
+        ],
+        rows: reports[0].rows.map((row, idx) => {
+          const record: Record<string, string | number> = { name: row.patientName };
+          reports.forEach((r) => {
+            record[r.metricKey] = Math.round((r.rows[idx]?.average ?? 0) * 10) / 10;
+          });
+          return record;
+        }),
+      };
+
+      const detailSheets: XlsxSheet[] = reports.map((r) => ({
+        sheetName: metricCatalog[r.metricKey].shortLabel,
+        columns: [
+          { header: 'Участник', key: 'name', width: 28 },
+          { header: 'Среднее значение', key: 'average', width: 20 },
+          { header: 'Текущее значение', key: 'latest', width: 18 },
+          { header: 'Динамика, %', key: 'change', width: 16 },
+        ],
+        rows: r.rows.map((row) => ({
+          name: row.patientName,
+          average: Math.round(row.average * 10) / 10,
+          latest: row.latestValue,
+          change: row.changePercent,
+        })),
+      }));
+
+      await exportSheetsToXlsx(`group-comparison-${groupId}`, [summarySheet, ...detailSheets]);
+    } finally {
+      setComparing(false);
+    }
+  };
 
   return (
     <PageContainer>
@@ -75,6 +136,53 @@ export function SpecialistReportsPage() {
             </div>
             <div>
               <Button onClick={handleGenerate}>Сформировать отчёт</Button>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="font-semibold text-navy-950">Сравнение по нескольким показателям</h2>
+                <p className="text-sm text-navy-800/60">
+                  Выберите показатели, чтобы выгрузить один отчёт для сравнения по группе
+                  {selectedGroup ? ` «${selectedGroup.name}»` : ''}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" type="button" onClick={() => setCompareKeys(metricKeys)}>
+                  Выбрать все
+                </Button>
+                <Button variant="ghost" size="sm" type="button" onClick={() => setCompareKeys([])}>
+                  Очистить
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {metricKeys.map((key) => (
+                <label
+                  key={key}
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-navy-400/15 px-3 py-2 text-sm text-navy-950 hover:bg-navy-400/5"
+                >
+                  <input
+                    type="checkbox"
+                    checked={compareKeys.includes(key)}
+                    onChange={() => toggleCompareKey(key)}
+                    className="h-4 w-4 rounded border-navy-400/40 accent-navy-800"
+                  />
+                  {metricCatalog[key].label}
+                </label>
+              ))}
+            </div>
+
+            <div>
+              <Button onClick={handleExportComparison} disabled={compareKeys.length === 0 || comparing}>
+                {comparing
+                  ? 'Формируем файл…'
+                  : `Экспортировать сравнение (${compareKeys.length})`}
+              </Button>
             </div>
           </CardBody>
         </Card>

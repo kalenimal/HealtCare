@@ -5,7 +5,7 @@ export type MetricKey =
   | 'kcal'
   | 'steps'
   | 'activityMinutes'
-  | 'waterGlasses'
+  | 'waterLiters'
   | 'stressLevel'
   | 'hb'
   | 'ferritin'

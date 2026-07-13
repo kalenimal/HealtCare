@@ -17,6 +17,7 @@ export function AuthForm() {
   const [patronymic, setPatronymic] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
 
@@ -40,10 +41,10 @@ export function AuthForm() {
 
   return (
     <>
-      <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <RoleSwitch value={role} onChange={setRole} />
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Input
             id="lastName"
             label="Фамилия"
@@ -90,6 +91,15 @@ export function AuthForm() {
         />
 
         <div className="flex items-center justify-between">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-navy-950">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="h-4 w-4 rounded border-navy-400/40 text-navy-800 accent-navy-800 focus:ring-2 focus:ring-navy-800/15"
+            />
+            Запомнить меня
+          </label>
           <button
             type="button"
             onClick={() => setForgotOpen(true)}
